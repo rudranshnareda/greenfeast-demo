@@ -1,19 +1,25 @@
 @import "tailwindcss";
+@import "./styles/effects.css";
 
 @theme {
-  --font-poppins: 'Poppins', sans-serif;
-  --font-inter: 'Inter', sans-serif;
+  /* Premium palette */
+  --color-cream:           #F7F1E1;
+  --color-bone:            #E3D8C1;
+  --color-sand:            #E1DBC9;
+  --color-pine:            #2D4530;
+  --color-pine-deep:       #1F2E20;
+  --color-earth:           #5E4B3B;
+  --color-earth-deep:      #3C2E22;
+  --color-goldenrod:       #B4833D;
+  --color-goldenrod-light: #C9A05F;
+  --color-coyote:          #81754B;
+  --color-charcoal:        #3C3C3C;
+  --color-ink:             #1A1A1A;
+  --color-slate:           #6B7B84;
 
-  --color-gf-green: #1B5E20;
-  --color-gf-green-dark: #0D3F12;
-  --color-gf-green-light: #388E3C;
-  --color-gf-green-pale: #E8F5E9;
-  --color-gf-yellow: #FCD303;
-  --color-gf-yellow-light: #FFF59D;
-  --color-gf-cream: #FDF9E8;
-  --color-gf-charcoal: #1A1A1A;
-  --color-gf-gray: #6B7280;
-  --color-gf-gray-light: #E5E7EB;
+  /* Typography */
+  --font-serif: '"Cormorant Garamond"', 'Georgia', serif;
+  --font-sans:  '"Inter"', system-ui, sans-serif;
 }
 
 * {
@@ -23,16 +29,17 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: #FDF9E8;
-  color: #1A1A1A;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+  background-color: #F7F1E1;
+  color: #3C3C3C;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Poppins', sans-serif;
+h1, h2, h3, h4 {
   margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
 }
 
 p { margin: 0; }

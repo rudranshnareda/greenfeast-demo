@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Layout from '../../components/Layout';
 import Button from '../../components/Button';
 import { DAYS_OF_WEEK } from '../../data/menu';
@@ -21,8 +22,7 @@ export default function SelectDays() {
     });
   };
 
-  const pricePerCycle = plan?.basePrice ?? 0;
-  const mealsPerDay = user?.mealsPerDay ?? 1;
+  const requiredLabel = required === 3 ? 'three' : 'six';
 
   const handleNext = () => {
     saveUserToStorage({ selectedDays });
@@ -30,54 +30,51 @@ export default function SelectDays() {
   };
 
   return (
-    <Layout title="Pick your delivery days" showBack>
-      <div className="space-y-6 pb-32">
-        <p className="text-[#6B7280] text-sm">
-          Select exactly <span className="font-semibold text-[#1B5E20]">{required} days</span>
-        </p>
-
-        <div className="flex gap-2 flex-wrap">
+    <Layout
+      title="When shall we arrive?"
+      subtitle={`Select ${requiredLabel} days that anchor your week`}
+      showBack
+    >
+      <div className="space-y-8 pb-32">
+        <div className="flex flex-wrap gap-3">
           {DAYS_OF_WEEK.map(day => {
             const selected = selectedDays.includes(day);
             const disabled = !selected && selectedDays.length >= required;
             return (
-              <button
+              <motion.button
                 key={day}
                 onClick={() => toggleDay(day)}
                 disabled={disabled}
-                className={`px-5 py-3 rounded-full font-semibold text-sm transition-all duration-150 min-h-[44px] min-w-[64px] ${
+                whileTap={disabled ? undefined : { scale: 0.95 }}
+                className={`px-6 py-3 rounded-xl font-sans text-sm tracking-wide transition-all duration-150 min-h-[48px] min-w-[72px] ${
                   selected
-                    ? 'bg-[#1B5E20] text-white shadow-sm'
+                    ? 'bg-pine text-cream shadow-sm'
                     : disabled
-                    ? 'bg-[#F3F4F6] text-[#D1D5DB] border border-[#E5E7EB] cursor-not-allowed'
-                    : 'bg-white text-[#1B5E20] border-2 border-[#1B5E20]'
+                    ? 'bg-bone/30 text-slate/40 cursor-not-allowed border border-bone/40'
+                    : 'glass grain text-pine border border-pine/20'
                 }`}
               >
                 {day}
-              </button>
+              </motion.button>
             );
           })}
-          {/* Sunday always disabled */}
-          <button
-            disabled
-            className="px-5 py-3 rounded-full font-semibold text-sm bg-[#F3F4F6] text-[#D1D5DB] border border-[#E5E7EB] cursor-not-allowed min-h-[44px] min-w-[64px] line-through"
-          >
+          <button disabled className="px-6 py-3 rounded-xl font-sans text-sm bg-bone/30 text-slate/30 border border-bone/30 cursor-not-allowed min-h-[48px] min-w-[72px] line-through">
             Sun
           </button>
         </div>
 
-        {/* Counter */}
-        <div className="bg-[#E8F5E9] rounded-2xl p-4">
-          <p className="text-sm text-[#6B7280]">
-            {selectedDays.length} of {required} days selected · {mealsPerDay} meal/day
+        {/* Summary */}
+        <div className="px-2">
+          <p className="font-sans text-xs text-slate uppercase tracking-widest">
+            {selectedDays.length} of {required} days selected
           </p>
-          <p className="text-xl font-bold text-[#1B5E20] mt-1">
-            ₹{pricePerCycle.toLocaleString()}
+          <p className="font-serif text-3xl text-pine mt-1">
+            ₹{(plan?.basePrice ?? 0).toLocaleString()}
           </p>
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 pb-6 pt-3 bg-gradient-to-t from-[#FDF9E8] to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-6 pb-8 pt-4 bg-gradient-to-t from-cream to-transparent">
         <Button
           onClick={handleNext}
           fullWidth

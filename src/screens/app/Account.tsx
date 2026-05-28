@@ -1,189 +1,214 @@
 import { useState } from 'react';
 import { Edit2, Wallet, MessageCircle, HelpCircle, LogOut, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import BottomNav from '../../components/BottomNav';
 import { getUserFromStorage, clearStorage } from '../../lib/storage';
 
 const FAQS = [
-  { q: 'Can I change my meals after subscribing?', a: 'Yes! You can swap meals up to 8 PM the night before delivery.' },
-  { q: 'What if I need to skip a day?', a: 'Use "Skip a day" in My Subscription anytime before 8 PM the night before.' },
-  { q: 'Are your meals really preservative-free?', a: 'Absolutely. Every meal is freshly prepared the same morning it\'s delivered.' },
-  { q: 'Can I pause my subscription?', a: 'Yes, you can pause for up to 2 weeks per cycle from the Subscription tab.' },
+  { q: 'Can I change my meals after subscribing?', a: 'Yes — curate your week up to 8 PM the night before delivery.' },
+  { q: 'What if I need to skip a day?', a: 'Use "Skip a day" in Your Plan anytime before 8 PM the night before.' },
+  { q: 'Are your meals preservative-free?', a: 'Always. Every meal is prepared fresh on the morning of delivery.' },
+  { q: 'Can I pause my subscription?', a: 'Yes, pause for up to two weeks per cycle from the Plan tab.' },
 ];
 
 export default function Account() {
   const user = getUserFromStorage()!;
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [showFaqs, setShowFaqs] = useState(false);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
 
-  const paymentDate = new Date(user.subscriptionStartDate ?? Date.now()).toLocaleDateString('en-IN', {
-    day: 'numeric', month: 'short', year: 'numeric'
-  });
+  const paymentDate = new Date(user.subscriptionStartDate ?? Date.now())
+    .toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const handleLogout = () => {
-    clearStorage();
-    window.location.reload();
-  };
+  const handleLogout = () => { clearStorage(); window.location.reload(); };
+  const handleReset = () => { localStorage.clear(); window.location.reload(); };
 
-  const handleReset = () => {
-    localStorage.clear();
-    window.location.reload();
-  };
+  const SECTION_LABEL = 'font-sans text-[10px] uppercase tracking-widest text-slate mb-4 block';
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-[#FDF9E8]">
-      <header className="px-4 pt-10 pb-4">
-        <h1 className="text-xl font-bold text-[#1A1A1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Account
-        </h1>
+    <motion.div
+      className="max-w-md mx-auto min-h-screen bg-gradient-to-b from-cream via-cream to-bone/40"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+    >
+      <header className="px-6 pt-10 pb-5">
+        <h1 className="font-serif text-3xl text-ink">You</h1>
       </header>
 
-      <div className="px-4 pb-24 space-y-4">
-        {/* Profile card */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <p className="font-semibold text-[#1A1A1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>Profile</p>
-            <button className="text-[#1B5E20] text-sm font-medium flex items-center gap-1">
-              <Edit2 size={14} /> Edit
+      <div className="px-6 pb-24 space-y-4">
+        {/* Profile */}
+        <div className="glass grain rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className={SECTION_LABEL}>Profile</span>
+            <button className="font-sans text-xs text-pine flex items-center gap-1">
+              <Edit2 size={12} strokeWidth={1.5} /> Edit
             </button>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-[#1B5E20] flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-lg">{user.name.charAt(0).toUpperCase()}</span>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-pine flex items-center justify-center flex-shrink-0">
+              <span className="font-serif text-2xl text-cream">{user.name.charAt(0)}</span>
             </div>
             <div>
-              <p className="font-semibold text-[#1A1A1A]">{user.name}</p>
-              <p className="text-sm text-[#6B7280]">+91 {user.phone}</p>
+              <p className="font-serif text-xl text-ink">{user.name}</p>
+              <p className="font-sans text-sm text-slate">+91 {user.phone}</p>
             </div>
           </div>
         </div>
 
-        {/* Wallet card */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Wallet size={18} className="text-[#1B5E20]" />
-            <p className="font-semibold text-[#1A1A1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>Wallet</p>
+        {/* Credit */}
+        <div className="glass grain rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Wallet size={14} strokeWidth={1.5} className="text-slate" />
+            <span className={SECTION_LABEL + ' mb-0'}>Credit</span>
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-2xl font-bold text-[#1A1A1A]">₹{user.wallet ?? 0}</p>
-              <p className="text-xs text-[#9CA3AF]">Available balance</p>
+              <p className="font-serif text-3xl text-ink">₹{user.wallet ?? 0}</p>
+              <p className="font-sans text-[10px] text-slate uppercase tracking-widest mt-0.5">Available</p>
             </div>
-            <button className="bg-[#1B5E20] text-white text-sm font-semibold px-4 py-2 rounded-full min-h-[40px]">
-              Add money
+            <button className="border border-pine/30 text-pine font-sans text-xs tracking-wide px-4 py-2 rounded-xl min-h-[40px]">
+              Add credit
             </button>
           </div>
-          <button className="mt-3 text-sm text-[#1B5E20] font-medium">View transactions</button>
-          <div className="mt-2 bg-[#F9FAFB] rounded-xl px-3 py-2">
-            <p className="text-xs text-[#9CA3AF] text-center">No transactions yet</p>
+          <button className="font-sans text-xs text-pine mt-3 block">View transactions</button>
+          <div className="mt-2 border border-bone rounded-xl px-4 py-3">
+            <p className="font-sans text-[10px] text-slate/60 italic text-center">No transactions yet</p>
           </div>
         </div>
 
         {/* Payment history */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="font-semibold text-[#1A1A1A] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Payment history
-          </p>
-          <div className="flex items-center justify-between py-2">
+        <div className="glass grain rounded-2xl p-6">
+          <span className={SECTION_LABEL}>Payment history</span>
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-[#1A1A1A]">{user.plan?.name} — subscription</p>
-              <p className="text-xs text-[#9CA3AF]">{paymentDate} · Paid via UPI</p>
+              <p className="font-sans text-sm text-charcoal">{user.plan?.name}</p>
+              <p className="font-sans text-[10px] text-slate uppercase tracking-widest mt-0.5">{paymentDate} · UPI</p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-bold text-[#1B5E20]">₹{user.plan?.basePrice.toLocaleString()}</p>
-              <button className="text-xs text-[#1B5E20] underline mt-0.5">Invoice</button>
+              <p className="font-serif text-lg text-pine">₹{user.plan?.basePrice.toLocaleString()}</p>
+              <button className="font-sans text-[10px] text-pine/60 underline mt-0.5">Invoice</button>
             </div>
           </div>
         </div>
 
         {/* Support */}
-        <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+        <div className="glass grain rounded-2xl overflow-hidden divide-y divide-bone/50">
           <a
             href="https://wa.me/918829040566"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 px-4 py-4 min-h-[56px] border-b border-[#F3F4F6] active:bg-[#F9FAFB]"
+            className="flex items-center gap-4 px-6 py-4 min-h-[56px] active:bg-bone/20 transition-colors"
           >
-            <MessageCircle size={18} className="text-[#25D366]" />
-            <span className="text-sm text-[#1A1A1A] flex-1">WhatsApp Support</span>
+            <MessageCircle size={16} strokeWidth={1.5} className="text-[#25D366]" />
+            <span className="font-sans text-sm text-charcoal flex-1">WhatsApp</span>
           </a>
 
           <button
-            onClick={() => setFaqOpen(faqOpen === -1 ? null : -1)}
-            className="flex items-center gap-3 px-4 py-4 w-full min-h-[56px] border-b border-[#F3F4F6]"
+            onClick={() => setShowFaqs(!showFaqs)}
+            className="flex items-center gap-4 px-6 py-4 w-full min-h-[56px] active:bg-bone/20"
           >
-            <HelpCircle size={18} className="text-[#1B5E20]" />
-            <span className="text-sm text-[#1A1A1A] flex-1 text-left">FAQ</span>
-            {faqOpen === -1 ? <ChevronUp size={16} className="text-[#9CA3AF]" /> : <ChevronDown size={16} className="text-[#9CA3AF]" />}
+            <HelpCircle size={16} strokeWidth={1.5} className="text-slate" />
+            <span className="font-sans text-sm text-charcoal flex-1 text-left">FAQ</span>
+            {showFaqs ? <ChevronUp size={14} className="text-slate" /> : <ChevronDown size={14} className="text-slate" />}
           </button>
 
-          {faqOpen === -1 && (
-            <div className="px-4 pb-2 space-y-2">
-              {FAQS.map((faq, i) => (
-                <div key={i}>
-                  <button
-                    onClick={() => setFaqOpen(faqOpen === i ? -1 : i)}
-                    className="flex items-start justify-between gap-2 w-full py-2 text-left"
-                  >
-                    <p className="text-sm font-medium text-[#1A1A1A]">{faq.q}</p>
-                    {faqOpen === i ? <ChevronUp size={14} className="text-[#9CA3AF] flex-shrink-0 mt-0.5" /> : <ChevronDown size={14} className="text-[#9CA3AF] flex-shrink-0 mt-0.5" />}
-                  </button>
-                  {faqOpen === i && (
-                    <p className="text-xs text-[#6B7280] pb-2 leading-relaxed">{faq.a}</p>
-                  )}
+          <AnimatePresence>
+            {showFaqs && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="px-6 pb-4 space-y-1">
+                  {FAQS.map((faq, i) => (
+                    <div key={i}>
+                      <button
+                        onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+                        className="flex items-start justify-between gap-2 w-full py-3 text-left"
+                      >
+                        <p className="font-sans text-sm text-charcoal">{faq.q}</p>
+                        {faqOpen === i
+                          ? <ChevronUp size={13} className="text-slate flex-shrink-0 mt-0.5" />
+                          : <ChevronDown size={13} className="text-slate flex-shrink-0 mt-0.5" />}
+                      </button>
+                      <AnimatePresence>
+                        {faqOpen === i && (
+                          <motion.p
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="font-sans text-xs text-slate leading-relaxed italic overflow-hidden"
+                          >
+                            {faq.a}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <button
             onClick={() => setLogoutConfirm(true)}
-            className="flex items-center gap-3 px-4 py-4 w-full min-h-[56px] active:bg-[#F9FAFB]"
+            className="flex items-center gap-4 px-6 py-4 w-full min-h-[56px] active:bg-bone/20"
           >
-            <LogOut size={18} className="text-[#6B7280]" />
-            <span className="text-sm text-[#6B7280]">Logout</span>
+            <LogOut size={16} strokeWidth={1.5} className="text-slate" />
+            <span className="font-sans text-sm text-slate">Log out</span>
           </button>
         </div>
 
-        {/* Reset Demo button */}
+        {/* Reset demo */}
         <button
           onClick={() => setResetConfirm(true)}
-          className="w-full py-3 rounded-full border-2 border-red-400 text-red-500 font-semibold text-sm min-h-[48px] flex items-center justify-center gap-2 active:bg-red-50 transition-colors"
+          className="w-full py-3 rounded-xl border border-red-300/50 text-red-400/80 font-sans text-xs tracking-wide min-h-[44px] flex items-center justify-center gap-2 active:bg-red-50/30 transition-colors"
         >
-          <Trash2 size={16} />
-          Reset Demo (Clear All Data)
+          <Trash2 size={13} strokeWidth={1.5} />
+          Reset demo
         </button>
       </div>
 
       <BottomNav />
 
       {/* Logout confirm */}
-      {logoutConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6">
-          <div className="bg-white rounded-3xl p-6 max-w-xs w-full">
-            <h2 className="text-lg font-bold text-[#1A1A1A] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>Log out?</h2>
-            <p className="text-sm text-[#6B7280] mb-5">Your subscription data will be saved.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setLogoutConfirm(false)} className="flex-1 py-3 rounded-full bg-[#E8F5E9] text-[#1B5E20] font-semibold text-sm min-h-[44px]">Cancel</button>
-              <button onClick={handleLogout} className="flex-1 py-3 rounded-full bg-[#1B5E20] text-white font-semibold text-sm min-h-[44px]">Log out</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {logoutConfirm && (
+          <motion.div className="fixed inset-0 z-50 flex items-center justify-center px-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={() => setLogoutConfirm(false)} />
+            <motion.div className="relative glass-dark grain rounded-3xl p-8 w-full max-w-xs" initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}>
+              <h2 className="font-serif text-2xl text-cream mb-2">Log out?</h2>
+              <p className="font-sans text-sm text-cream/60 mb-6">Your subscription data will be saved.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setLogoutConfirm(false)} className="flex-1 py-3 rounded-xl border border-cream/20 text-cream font-sans text-sm min-h-[48px]">Cancel</button>
+                <button onClick={handleLogout} className="flex-1 py-3 rounded-xl bg-pine text-cream font-sans text-sm min-h-[48px]">Log out</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Reset confirm */}
-      {resetConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-6">
-          <div className="bg-white rounded-3xl p-6 max-w-xs w-full">
-            <h2 className="text-lg font-bold text-[#1A1A1A] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>Reset demo?</h2>
-            <p className="text-sm text-[#6B7280] mb-5">This clears all saved data and returns to the first-time user flow.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setResetConfirm(false)} className="flex-1 py-3 rounded-full bg-[#E8F5E9] text-[#1B5E20] font-semibold text-sm min-h-[44px]">Cancel</button>
-              <button onClick={handleReset} className="flex-1 py-3 rounded-full bg-red-500 text-white font-semibold text-sm min-h-[44px]">Reset</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      <AnimatePresence>
+        {resetConfirm && (
+          <motion.div className="fixed inset-0 z-50 flex items-center justify-center px-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={() => setResetConfirm(false)} />
+            <motion.div className="relative glass-dark grain rounded-3xl p-8 w-full max-w-xs" initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}>
+              <h2 className="font-serif text-2xl text-cream mb-2">Reset demo?</h2>
+              <p className="font-sans text-sm text-cream/60 mb-6">All saved data will be cleared and you'll return to the first-time flow.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setResetConfirm(false)} className="flex-1 py-3 rounded-xl border border-cream/20 text-cream font-sans text-sm min-h-[48px]">Cancel</button>
+                <button onClick={handleReset} className="flex-1 py-3 rounded-xl bg-red-500/80 text-cream font-sans text-sm min-h-[48px]">Reset</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

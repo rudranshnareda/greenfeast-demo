@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Layout from '../../components/Layout';
 import Button from '../../components/Button';
 import { ALLERGENS, ADD_ONS } from '../../data/menu';
@@ -9,8 +10,7 @@ import { getUserFromStorage, saveUserToStorage } from '../../lib/storage';
 export default function DietaryProfile() {
   const navigate = useNavigate();
   const user = getUserFromStorage();
-  const plan = user?.plan;
-  const mealCount = plan?.mealsTotal ?? 5;
+  const mealCount = user?.plan?.mealsTotal ?? 5;
 
   const [allergens, setAllergens] = useState<{ name: string; severity: 'mild' | 'severe' }[]>(
     user?.dietary?.allergens ?? []
@@ -22,24 +22,33 @@ export default function DietaryProfile() {
       : ADD_ONS.map(a => ({ id: a.id, selected: false }))
   );
 
+  const addOnNames: Record<string, string> = {
+    'extra-protein': 'Additional Protein',
+    'extra-cheese': 'Aged Cheese',
+    'exotic-fruits': 'Seasonal Cut Fruits',
+  };
+  const addOnDescriptions: Record<string, string> = {
+    'extra-protein': '8–10g per meal',
+    'extra-cheese': 'Feta, Parmesan, or Cheddar',
+    'exotic-fruits': '',
+  };
+
   const toggleAllergen = (name: string) => {
-    setAllergens(prev => {
-      if (prev.some(a => a.name === name)) return prev.filter(a => a.name !== name);
-      return [...prev, { name, severity: 'mild' }];
-    });
+    setAllergens(prev =>
+      prev.some(a => a.name === name)
+        ? prev.filter(a => a.name !== name)
+        : [...prev, { name, severity: 'mild' }]
+    );
   };
 
-  const setSeverity = (name: string, severity: 'mild' | 'severe') => {
+  const setSeverity = (name: string, severity: 'mild' | 'severe') =>
     setAllergens(prev => prev.map(a => a.name === name ? { ...a, severity } : a));
-  };
 
-  const toggleAddOn = (id: string) => {
+  const toggleAddOn = (id: string) =>
     setAddOns(prev => prev.map(a => a.id === id ? { ...a, selected: !a.selected } : a));
-  };
 
-  const setSubOption = (id: string, subOption: string) => {
+  const setSubOption = (id: string, subOption: string) =>
     setAddOns(prev => prev.map(a => a.id === id ? { ...a, subOption } : a));
-  };
 
   const addOnTotal = addOns.reduce((sum, ao) => {
     if (!ao.selected) return sum;
@@ -52,31 +61,28 @@ export default function DietaryProfile() {
     navigate('/address');
   };
 
-  return (
-    <Layout title="Tell us about your diet" showBack>
-      <div className="space-y-6 pb-32">
+  const LABEL = 'font-sans text-xs uppercase tracking-widest text-slate mb-4 block';
 
-        {/* Allergens */}
+  return (
+    <Layout title="What we should know" subtitle="Preferences & enhancements" showBack>
+      <div className="space-y-8 pb-32">
+
+        {/* Considerations */}
         <div>
-          <p className="font-semibold text-[#1A1A1A] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Allergens & dislikes
-          </p>
+          <span className={LABEL}>Considerations</span>
           <div className="space-y-2">
             {ALLERGENS.map(name => {
               const checked = allergens.some(a => a.name === name);
               const entry = allergens.find(a => a.name === name);
               return (
-                <div key={name} className="bg-white rounded-2xl border border-[#E5E7EB] px-4 py-3">
-                  <button
-                    onClick={() => toggleAllergen(name)}
-                    className="flex items-center gap-3 w-full min-h-[36px]"
-                  >
-                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                      checked ? 'bg-[#1B5E20] border-[#1B5E20]' : 'border-[#D1D5DB]'
+                <div key={name} className="glass grain rounded-2xl px-5 py-3">
+                  <button onClick={() => toggleAllergen(name)} className="flex items-center gap-3 w-full min-h-[40px]">
+                    <div className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-all ${
+                      checked ? 'bg-pine border-pine' : 'border-bone'
                     }`}>
-                      {checked && <Check size={12} color="white" strokeWidth={3} />}
+                      {checked && <Check size={11} color="#F7F1E1" strokeWidth={3} />}
                     </div>
-                    <span className="text-sm text-[#1A1A1A]">{name}</span>
+                    <span className="font-sans text-sm text-charcoal">{name}</span>
                   </button>
                   {checked && (
                     <div className="flex gap-2 mt-2 ml-8">
@@ -84,10 +90,12 @@ export default function DietaryProfile() {
                         <button
                           key={s}
                           onClick={() => setSeverity(name, s)}
-                          className={`px-3 py-1 rounded-full text-xs font-semibold capitalize transition-all ${
+                          className={`px-3 py-1 rounded-full font-sans text-xs tracking-wide capitalize transition-all border ${
                             entry?.severity === s
-                              ? s === 'severe' ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-[#FFF59D] text-[#5D4037] border border-[#FCD303]'
-                              : 'bg-[#F3F4F6] text-[#6B7280]'
+                              ? s === 'severe'
+                                ? 'bg-red-900/20 text-red-400 border-red-400/30'
+                                : 'bg-goldenrod/10 text-coyote border-goldenrod/30'
+                              : 'text-slate border-bone'
                           }`}
                         >
                           {s}
@@ -102,49 +110,45 @@ export default function DietaryProfile() {
           <textarea
             value={freeText}
             onChange={e => setFreeText(e.target.value)}
-            placeholder="Any other constraints or dislikes?"
+            placeholder="Any other notes for the kitchen..."
             rows={3}
-            className="w-full mt-3 bg-white border border-[#E5E7EB] rounded-2xl px-4 py-3 text-sm text-[#1A1A1A] placeholder-[#9CA3AF] outline-none focus:border-[#1B5E20] transition-colors resize-none"
+            className="w-full mt-3 bg-transparent border-b border-bone focus:border-pine outline-none py-3 font-sans text-sm text-charcoal placeholder:text-slate/50 resize-none transition-colors"
           />
         </div>
 
-        {/* Add-ons */}
+        {/* Enhancements */}
         <div>
-          <p className="font-semibold text-[#1A1A1A] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Add-ons
-          </p>
-          <p className="text-xs text-[#6B7280] mb-3">Applied to every meal in your plan</p>
+          <span className={LABEL}>Enhancements</span>
           <div className="space-y-2">
             {ADD_ONS.map(addOn => {
               const state = addOns.find(a => a.id === addOn.id);
               const selected = state?.selected ?? false;
+              const displayName = addOnNames[addOn.id] ?? addOn.name;
+              const desc = addOnDescriptions[addOn.id] ?? '';
               return (
-                <div key={addOn.id} className={`bg-white rounded-2xl border-2 transition-all ${selected ? 'border-[#1B5E20]' : 'border-[#E5E7EB]'}`}>
-                  <button
-                    onClick={() => toggleAddOn(addOn.id)}
-                    className="flex items-center gap-3 w-full px-4 py-3 min-h-[52px]"
-                  >
-                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                      selected ? 'bg-[#1B5E20] border-[#1B5E20]' : 'border-[#D1D5DB]'
+                <div key={addOn.id} className={`glass grain rounded-2xl transition-all ${selected ? 'ring-1 ring-pine/30' : ''}`}>
+                  <button onClick={() => toggleAddOn(addOn.id)} className="flex items-center gap-3 w-full px-5 py-4 min-h-[56px]">
+                    <div className={`w-5 h-5 rounded-md border flex items-center justify-center flex-shrink-0 transition-all ${
+                      selected ? 'bg-pine border-pine' : 'border-bone'
                     }`}>
-                      {selected && <Check size={12} color="white" strokeWidth={3} />}
+                      {selected && <Check size={11} color="#F7F1E1" strokeWidth={3} />}
                     </div>
                     <div className="flex-1 text-left">
-                      <p className="text-sm font-semibold text-[#1A1A1A]">{addOn.name}</p>
-                      {addOn.description && <p className="text-xs text-[#6B7280]">{addOn.description}</p>}
+                      <p className="font-sans text-sm text-charcoal">{displayName}</p>
+                      {desc && <p className="font-sans text-xs text-slate italic mt-0.5">{desc}</p>}
                     </div>
-                    <span className="text-sm font-semibold text-[#1B5E20]">+₹{addOn.pricePerMeal}/meal</span>
+                    <span className="font-sans text-xs text-pine tracking-wide">+₹{addOn.pricePerMeal}/meal</span>
                   </button>
                   {selected && addOn.id === 'extra-cheese' && (
-                    <div className="px-4 pb-3 flex gap-2">
+                    <div className="px-5 pb-4 flex gap-2">
                       {['Feta', 'Parmesan', 'Cheddar'].map(opt => (
                         <button
                           key={opt}
                           onClick={() => setSubOption(addOn.id, opt)}
-                          className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                          className={`px-3 py-1.5 rounded-full font-sans text-xs tracking-wide border transition-all ${
                             state?.subOption === opt
-                              ? 'bg-[#1B5E20] text-white border-[#1B5E20]'
-                              : 'bg-white text-[#6B7280] border-[#E5E7EB]'
+                              ? 'bg-pine text-cream border-pine'
+                              : 'text-slate border-bone'
                           }`}
                         >
                           {opt}
@@ -158,19 +162,20 @@ export default function DietaryProfile() {
           </div>
         </div>
 
-        {/* Running total */}
         {addOnTotal > 0 && (
-          <div className="bg-[#E8F5E9] rounded-2xl p-4">
-            <p className="text-sm text-[#6B7280]">Add-ons total</p>
-            <p className="text-xl font-bold text-[#1B5E20]">+₹{addOnTotal}</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="px-2"
+          >
+            <p className="font-sans text-xs text-slate uppercase tracking-widest">Enhancements total</p>
+            <p className="font-serif text-2xl text-pine mt-1">+₹{addOnTotal}</p>
+          </motion.div>
         )}
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 pb-6 pt-3 bg-gradient-to-t from-[#FDF9E8] to-transparent">
-        <Button onClick={handleNext} fullWidth>
-          Add delivery address →
-        </Button>
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-6 pb-8 pt-4 bg-gradient-to-t from-cream to-transparent">
+        <Button onClick={handleNext} fullWidth>Where to deliver →</Button>
       </div>
     </Layout>
   );

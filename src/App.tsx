@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { getUserFromStorage } from './lib/storage';
 
 import PhoneAuth from './screens/onboarding/PhoneAuth';
@@ -15,13 +16,14 @@ import Menu from './screens/app/Menu';
 import Subscription from './screens/app/Subscription';
 import Account from './screens/app/Account';
 
-function App() {
+function AnimatedRoutes() {
+  const location = useLocation();
   const user = getUserFromStorage();
   const onboarded = user?.onboarded === true;
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
         {!onboarded ? (
           <>
             <Route path="/" element={<PhoneAuth />} />
@@ -44,7 +46,17 @@ function App() {
           </>
         )}
       </Routes>
-    </BrowserRouter>
+    </AnimatePresence>
+  );
+}
+
+function App() {
+  return (
+    <div className="grain-global">
+      <BrowserRouter>
+        <AnimatedRoutes />
+      </BrowserRouter>
+    </div>
   );
 }
 
