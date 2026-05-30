@@ -62,4 +62,7 @@ export interface User {
   wallet: number;
   subscriptionStartDate: string;
   deliveriesRemaining: number;
+  mealPricePerMeal?: number;
+  healthProfile?: { age: string; weight: string; height: string; goal: string };
+  dietaryPreference?: string;
 }

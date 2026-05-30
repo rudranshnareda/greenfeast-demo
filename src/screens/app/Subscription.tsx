@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pause, SkipForward, ArrowUpDown, X, Edit2 } from 'lucide-react';
+import { Pause, SkipForward, ArrowUpDown, X, Edit2 } from 'lucide-react'; // Edit2 kept for dietary card
 import BottomNav from '../../components/BottomNav';
 import { getUserFromStorage } from '../../lib/storage';
 import { ADD_ONS } from '../../data/menu';
@@ -123,22 +123,6 @@ export default function Subscription() {
           )}
         </div>
 
-        {/* Address card */}
-        {user.address && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <p className="font-semibold text-[#1A1A1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                Delivery Address
-              </p>
-              <button className="text-[#1B5E20] text-sm font-medium flex items-center gap-1">
-                <Edit2 size={14} /> Edit
-              </button>
-            </div>
-            <p className="text-sm text-[#1A1A1A]">{user.address.label} — {user.address.line1}</p>
-            <p className="text-sm text-[#6B7280]">{user.address.city} {user.address.pincode}</p>
-            <p className="text-xs text-[#9CA3AF] mt-1">{user.address.timeWindow}</p>
-          </div>
-        )}
       </div>
 
       <BottomNav />

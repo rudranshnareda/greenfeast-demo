@@ -181,9 +181,9 @@ export const PLANS: Plan[] = [
 ];
 
 export const ADD_ONS: AddOn[] = [
-  { id: 'extra-protein', name: 'Extra Protein', pricePerMeal: 45, description: '8–10g per meal' },
-  { id: 'extra-cheese', name: 'Extra Cheese', pricePerMeal: 30, description: 'Feta / Parmesan / Cheddar' },
-  { id: 'exotic-fruits', name: 'Exotic Cut Fruits', pricePerMeal: 99 },
+  { id: 'smoothie', name: 'Smoothie', pricePerMeal: 60 },
+  { id: 'exotic-fruits', name: 'Exotic Cut Fruits', pricePerMeal: 50 },
+  { id: 'cheese', name: 'Cheese', pricePerMeal: 30, description: 'Feta / Parmesan / Cheddar' },
 ];
 
 export const ALLERGENS = ['Peanuts', 'Gluten', 'Dairy', 'Tree nuts', 'Sesame', 'Other'];

@@ -5,12 +5,13 @@ import { ArrowLeft } from 'lucide-react';
 interface LayoutProps {
   children: ReactNode;
   title?: string;
+  subtitle?: string;
   showBack?: boolean;
   onBack?: () => void;
   noPadding?: boolean;
 }
 
-export default function Layout({ children, title, showBack, onBack, noPadding }: LayoutProps) {
+export default function Layout({ children, title, subtitle, showBack, onBack, noPadding }: LayoutProps) {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -31,9 +32,14 @@ export default function Layout({ children, title, showBack, onBack, noPadding }:
             </button>
           )}
           {title && (
-            <h1 className="text-lg font-semibold text-[#1A1A1A] flex-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              {title}
-            </h1>
+            <div className="flex-1">
+              <h1 className="text-lg font-semibold text-[#1A1A1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                {title}
+              </h1>
+              {subtitle && (
+                <p className="text-xs text-[#6B7280] mt-0.5">{subtitle}</p>
+              )}
+            </div>
           )}
         </header>
       )}

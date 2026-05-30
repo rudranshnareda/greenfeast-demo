@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Edit2, Wallet, MessageCircle, HelpCircle, LogOut, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Edit2, MessageCircle, HelpCircle, LogOut, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import BottomNav from '../../components/BottomNav';
 import { getUserFromStorage, clearStorage } from '../../lib/storage';
 
@@ -8,6 +8,7 @@ const FAQS = [
   { q: 'What if I need to skip a day?', a: 'Use "Skip a day" in My Subscription anytime before 8 PM the night before.' },
   { q: 'Are your meals really preservative-free?', a: 'Absolutely. Every meal is freshly prepared the same morning it\'s delivered.' },
   { q: 'Can I pause my subscription?', a: 'Yes, you can pause for up to 2 weeks per cycle from the Subscription tab.' },
+  { q: 'Can I change my delivery time slot?', a: 'Yes! Just message us on WhatsApp and we\'ll update your slot right away.' },
 ];
 
 export default function Account() {
@@ -15,10 +16,6 @@ export default function Account() {
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
-
-  const paymentDate = new Date(user.subscriptionStartDate ?? Date.now()).toLocaleDateString('en-IN', {
-    day: 'numeric', month: 'short', year: 'numeric'
-  });
 
   const handleLogout = () => {
     clearStorage();
@@ -54,44 +51,6 @@ export default function Account() {
             <div>
               <p className="font-semibold text-[#1A1A1A]">{user.name}</p>
               <p className="text-sm text-[#6B7280]">+91 {user.phone}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Wallet card */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Wallet size={18} className="text-[#1B5E20]" />
-            <p className="font-semibold text-[#1A1A1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>Wallet</p>
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold text-[#1A1A1A]">₹{user.wallet ?? 0}</p>
-              <p className="text-xs text-[#9CA3AF]">Available balance</p>
-            </div>
-            <button className="bg-[#1B5E20] text-white text-sm font-semibold px-4 py-2 rounded-full min-h-[40px]">
-              Add money
-            </button>
-          </div>
-          <button className="mt-3 text-sm text-[#1B5E20] font-medium">View transactions</button>
-          <div className="mt-2 bg-[#F9FAFB] rounded-xl px-3 py-2">
-            <p className="text-xs text-[#9CA3AF] text-center">No transactions yet</p>
-          </div>
-        </div>
-
-        {/* Payment history */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <p className="font-semibold text-[#1A1A1A] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Payment history
-          </p>
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <p className="text-sm font-medium text-[#1A1A1A]">{user.plan?.name} — subscription</p>
-              <p className="text-xs text-[#9CA3AF]">{paymentDate} · Paid via UPI</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm font-bold text-[#1B5E20]">₹{user.plan?.basePrice.toLocaleString()}</p>
-              <button className="text-xs text-[#1B5E20] underline mt-0.5">Invoice</button>
             </div>
           </div>
         </div>

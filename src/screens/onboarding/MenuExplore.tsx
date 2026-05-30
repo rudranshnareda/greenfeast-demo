@@ -85,16 +85,6 @@ export default function MenuExplore({ browseOnly = false }: MenuExploreProps) {
   return (
     <div className="max-w-md mx-auto min-h-screen bg-[#FDF9E8] flex flex-col">
       <header className="flex items-center gap-3 px-4 py-3 bg-[#FDF9E8] sticky top-0 z-10 border-b border-[#E5E7EB]">
-        {!browseOnly && (
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2 rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center active:bg-[#E8F5E9] transition-colors"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-        )}
         <h1 className="text-lg font-semibold text-[#1A1A1A] flex-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
           {browseOnly ? 'Menu' : 'Explore our menu'}
         </h1>
@@ -129,8 +119,8 @@ export default function MenuExplore({ browseOnly = false }: MenuExploreProps) {
       {/* Sticky CTA */}
       {!browseOnly && (
         <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 pb-6 pt-3 bg-gradient-to-t from-[#FDF9E8] to-transparent">
-          <Button onClick={() => navigate('/plan')} fullWidth>
-            Build your weekly plan →
+          <Button onClick={() => navigate('/subscription-options')} fullWidth>
+            Continue →
           </Button>
         </div>
       )}

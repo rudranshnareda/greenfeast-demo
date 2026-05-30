@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout';
 import Button from '../../components/Button';
-import { TIME_WINDOWS } from '../../data/menu';
 import { getUserFromStorage, saveUserToStorage } from '../../lib/storage';
 import type { Address } from '../../types';
 
@@ -16,7 +15,6 @@ export default function DeliveryAddress() {
   const [line1, setLine1] = useState(existing?.line1 ?? '');
   const [pincode, setPincode] = useState(existing?.pincode ?? '');
   const [landmark, setLandmark] = useState(existing?.landmark ?? '');
-  const [timeWindow, setTimeWindow] = useState(existing?.timeWindow ?? TIME_WINDOWS[0]);
   const [errors, setErrors] = useState<{ line1?: string; pincode?: string }>({});
 
   const validate = () => {
@@ -29,9 +27,9 @@ export default function DeliveryAddress() {
 
   const handleNext = () => {
     if (!validate()) return;
-    const address: Address = { label, type, line1, city: 'Jaipur', pincode, landmark, timeWindow };
+    const address: Address = { label, type, line1, city: 'Jaipur', pincode, landmark, timeWindow: 'Before 1:00 PM' };
     saveUserToStorage({ address });
-    navigate('/payment');
+    navigate('/review');
   };
 
   const INPUT =
@@ -120,38 +118,14 @@ export default function DeliveryAddress() {
           </div>
         </div>
 
-        {/* Time window */}
-        <div>
-          <p className="font-semibold text-[#1A1A1A] mb-2 text-sm" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Preferred delivery time
-          </p>
-          <div className="space-y-2">
-            {TIME_WINDOWS.map(tw => (
-              <button
-                key={tw}
-                onClick={() => setTimeWindow(tw)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 min-h-[48px] transition-all ${
-                  timeWindow === tw ? 'border-[#1B5E20] bg-[#E8F5E9]' : 'border-[#E5E7EB] bg-white'
-                }`}
-              >
-                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                  timeWindow === tw ? 'border-[#1B5E20]' : 'border-[#D1D5DB]'
-                }`}>
-                  {timeWindow === tw && <div className="w-2 h-2 rounded-full bg-[#1B5E20]" />}
-                </div>
-                <span className="text-sm text-[#1A1A1A]">{tw}</span>
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-[#6B7280] mt-2">
-            Orders must be finalized by 8 PM the night before delivery.
-          </p>
-        </div>
+        <p className="text-xs text-[#9CA3AF]">
+          📦 To change your preferred delivery time, reach out to us on WhatsApp.
+        </p>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto px-4 pb-6 pt-3 bg-gradient-to-t from-[#FDF9E8] to-transparent">
         <Button onClick={handleNext} fullWidth>
-          Review & pay →
+          Review order →
         </Button>
       </div>
     </Layout>
