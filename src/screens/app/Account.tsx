@@ -24,7 +24,7 @@ export default function Account() {
 
   const handleReset = () => {
     localStorage.clear();
-    window.location.reload();
+    window.location.href = '/';
   };
 
   return (
