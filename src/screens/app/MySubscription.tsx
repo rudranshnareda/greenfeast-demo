@@ -20,9 +20,49 @@ function getStatus(): { label: string; color: string } {
   return { label: 'Delivered', color: 'text-[#1B5E20] bg-[#E8F5E9]' };
 }
 
+function SubscribeGate() {
+  const navigate = useNavigate();
+  return (
+    <div className="fixed inset-0 z-40 flex flex-col items-center justify-center px-6">
+      {/* Blurred backdrop — the MySubscription content renders behind this */}
+      <div className="absolute inset-0 backdrop-blur-md bg-[#FDF9E8]/60" />
+      <motion.div
+        className="relative bg-white rounded-3xl p-8 w-full max-w-xs text-center shadow-2xl border border-[#E5E7EB]"
+        initial={{ opacity: 0, scale: 0.94, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="w-16 h-16 bg-[#E8F5E9] rounded-full flex items-center justify-center mx-auto mb-4">
+          <span className="text-3xl">🌿</span>
+        </div>
+        <h2 className="text-xl font-bold text-[#1A1A1A] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Start your plan
+        </h2>
+        <p className="text-sm text-[#6B7280] leading-relaxed mb-6">
+          Subscribe to unlock daily fresh meals, your weekly schedule, wallet, and more.
+        </p>
+        <button
+          onClick={() => navigate('/personal-info')}
+          className="w-full bg-[#1B5E20] text-white font-bold text-sm py-3.5 rounded-full min-h-[48px]"
+          style={{ fontFamily: 'Poppins, sans-serif' }}
+        >
+          Subscribe now →
+        </button>
+        <button
+          onClick={() => navigate('/menu')}
+          className="mt-3 w-full text-sm text-[#6B7280] py-2"
+        >
+          Explore menu first
+        </button>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function MySubscription() {
   const navigate = useNavigate();
   const user = getUserFromStorage()!;
+  const isSubscriber = !!(user?.plan);
   const status = getStatus();
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3);
@@ -56,6 +96,8 @@ export default function MySubscription() {
   };
 
   return (
+    <>
+    {!isSubscriber && <SubscribeGate />}
     <motion.div
       className="max-w-md mx-auto min-h-screen bg-[#FDF9E8]"
       initial={{ opacity: 0, y: 8 }}
@@ -311,5 +353,6 @@ export default function MySubscription() {
         )}
       </AnimatePresence>
     </motion.div>
+    </>
   );
 }
