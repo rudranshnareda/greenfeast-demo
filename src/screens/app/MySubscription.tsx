@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { MapPin, SkipForward, PauseCircle, PlusCircle, X, ClipboardList, Wallet, Edit2 } from 'lucide-react';
+import { MapPin, SkipForward, PauseCircle, PlusCircle, X, ClipboardList, Wallet, Edit2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
-import { MEALS } from '../../data/menu';
+import { MEALS, DAYS_OF_WEEK } from '../../data/menu';
 import { getUserFromStorage, saveUserToStorage } from '../../lib/storage';
 
 function getGreeting(name: string) {
@@ -25,15 +25,26 @@ export default function MySubscription() {
   const user = getUserFromStorage()!;
   const status = getStatus();
 
-  // Show only the selected delivery days (respecting user's opt-in/opt-out choice)
-  const days = user.selectedDays?.length ? user.selectedDays : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
   const today = new Date().toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3);
   const mode = user.deliveryMode ?? 'opt-out';
 
+  // selectedDays = days that have delivery active this week
+  const [activeDays, setActiveDays] = useState<string[]>(
+    user.selectedDays?.length ? user.selectedDays : (mode === 'opt-out' ? [...DAYS_OF_WEEK] : [])
+  );
   const getMeal = (id: string) => MEALS.find(m => m.id === id);
   const [weeklyPlan, setWeeklyPlan] = useState(user.weeklyMealPlan ?? {});
   const [swapDay, setSwapDay] = useState<string | null>(null);
 
+  const toggleDay = (day: string) => {
+    const updated = activeDays.includes(day)
+      ? activeDays.filter(d => d !== day)
+      : [...activeDays, day];
+    setActiveDays(updated);
+    saveUserToStorage({ selectedDays: updated });
+  };
+
+  const todayActive = activeDays.includes(today);
   const todayMealId = weeklyPlan[today] ?? Object.values(weeklyPlan)[0];
   const todayMeal = todayMealId ? getMeal(todayMealId) : MEALS[0];
 
@@ -58,14 +69,9 @@ export default function MySubscription() {
             <h1 className="text-2xl font-bold text-[#1A1A1A] leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {getGreeting(user.name)}
             </h1>
-            <div className="flex items-center gap-2 mt-2">
-              <div className="flex items-center gap-1">
-                <MapPin size={12} className="text-[#9CA3AF]" />
-                <span className="text-xs text-[#9CA3AF] uppercase tracking-wide">{user.address?.city ?? 'Jaipur'}</span>
-              </div>
-              <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-[#E8F5E9] text-[#1B5E20]">
-                {mode === 'opt-in' ? 'Pick days' : 'Skip days'}
-              </span>
+            <div className="flex items-center gap-1 mt-1">
+              <MapPin size={12} className="text-[#9CA3AF]" />
+              <span className="text-xs text-[#9CA3AF] uppercase tracking-wide">{user.address?.city ?? 'Jaipur'}</span>
             </div>
           </div>
           <img src="/logo.png" alt="GreenFeast" className="w-9 h-9 object-contain opacity-80" />
@@ -83,50 +89,93 @@ export default function MySubscription() {
             </span>
           </div>
           <div className="flex items-center gap-3 px-4 pb-4">
-            {todayMeal && (
-              <img src={todayMeal.imageUrl} alt={todayMeal.name} className="w-18 h-18 w-[72px] h-[72px] rounded-xl object-cover flex-shrink-0" />
+            {todayActive && todayMeal ? (
+              <>
+                <img src={todayMeal.imageUrl} alt={todayMeal.name} className="w-[72px] h-[72px] rounded-xl object-cover flex-shrink-0" />
+                <div>
+                  <p className="font-bold text-base text-[#1A1A1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>{todayMeal.name}</p>
+                  <p className="text-xs text-[#9CA3AF] mt-0.5">{user.address?.timeWindow ?? 'Before 1:00 PM'}</p>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="w-[72px] h-[72px] rounded-xl bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">🚫</span>
+                </div>
+                <div>
+                  <p className="font-bold text-base text-[#9CA3AF]" style={{ fontFamily: 'Poppins, sans-serif' }}>No delivery today</p>
+                  <p className="text-xs text-[#9CA3AF] mt-0.5">You've skipped today</p>
+                </div>
+              </div>
             )}
-            <div>
-              <p className="font-bold text-base text-[#1A1A1A]" style={{ fontFamily: 'Poppins, sans-serif' }}>{todayMeal?.name ?? '—'}</p>
-              <p className="text-xs text-[#9CA3AF] mt-0.5">{user.address?.timeWindow ?? 'Before 1:00 PM'}</p>
-            </div>
           </div>
         </div>
 
         {/* The week ahead */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9CA3AF] mb-2">
-            {mode === 'opt-in' ? 'Your delivery days' : 'The week ahead'}
-          </p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9CA3AF]">This week</p>
+            <p className="text-[10px] text-[#9CA3AF]">
+              {mode === 'opt-out' ? 'Tap to skip a day' : 'Tap to add a day'}
+            </p>
+          </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-            {days.map((day, i) => {
+            {DAYS_OF_WEEK.map((day, i) => {
+              const isActive = activeDays.includes(day);
               const mealId = weeklyPlan[day];
               const meal = mealId ? getMeal(mealId) : null;
               const isToday = day === today;
-              const isPast = i < days.indexOf(today);
+              const todayIndex = DAYS_OF_WEEK.indexOf(today);
+              const isPast = todayIndex >= 0 && i < todayIndex;
               return (
-                <motion.button
-                  key={day}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => setSwapDay(day)}
-                  className={`flex-shrink-0 w-[84px] rounded-2xl overflow-hidden border transition-all ${
-                    isToday ? 'border-[#FCD303] shadow-sm' : 'border-[#E5E7EB]'
-                  } ${isPast ? 'opacity-40' : ''} bg-white`}
-                >
-                  <p className="text-[9px] font-semibold uppercase tracking-widest text-[#9CA3AF] text-center pt-2">{day}</p>
-                  {meal ? (
-                    <img src={meal.imageUrl} alt={meal.name} className="w-full h-14 object-cover mt-1" />
-                  ) : (
-                    <div className="w-full h-14 bg-[#F3F4F6] mt-1" />
+                <div key={day} className="flex-shrink-0 w-[84px] flex flex-col gap-1">
+                  {/* Toggle button */}
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => toggleDay(day)}
+                    disabled={isPast}
+                    className={`w-full rounded-2xl overflow-hidden border-2 transition-all ${
+                      isPast ? 'opacity-30 cursor-not-allowed' :
+                      isToday ? 'border-[#FCD303]' :
+                      isActive ? 'border-[#1B5E20]/30' : 'border-dashed border-[#D1D5DB]'
+                    } ${isActive ? 'bg-white' : 'bg-[#F9FAFB]'}`}
+                  >
+                    <div className="flex items-center justify-between px-2 pt-2">
+                      <p className={`text-[9px] font-semibold uppercase tracking-widest ${isToday ? 'text-[#1B5E20]' : 'text-[#9CA3AF]'}`}>{day}</p>
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        isActive ? 'bg-[#1B5E20]' : 'bg-[#E5E7EB]'
+                      }`}>
+                        {isActive
+                          ? <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                          : <Plus size={8} className="text-[#9CA3AF]" />
+                        }
+                      </div>
+                    </div>
+                    {isActive && meal ? (
+                      <img src={meal.imageUrl} alt={meal.name} className="w-full h-14 object-cover mt-1" />
+                    ) : (
+                      <div className={`w-full h-14 mt-1 flex items-center justify-center ${isActive ? 'bg-[#F3F4F6]' : 'bg-transparent'}`}>
+                        {!isActive && <p className="text-[8px] text-[#D1D5DB] text-center px-1">No delivery</p>}
+                      </div>
+                    )}
+                    <p className={`text-[9px] text-center px-1.5 py-1.5 leading-tight truncate ${isActive ? 'text-[#9CA3AF]' : 'text-[#D1D5DB]'}`}>
+                      {isActive ? (meal?.name.split(' ').slice(0, 2).join(' ') ?? '—') : ''}
+                    </p>
+                  </motion.button>
+                  {/* Swap meal button — only for active days */}
+                  {isActive && !isPast && (
+                    <button
+                      onClick={() => setSwapDay(day)}
+                      className="w-full text-[8px] text-[#1B5E20] font-semibold text-center py-1 bg-[#E8F5E9] rounded-lg"
+                    >
+                      swap
+                    </button>
                   )}
-                  <p className="text-[9px] text-[#9CA3AF] text-center px-1.5 py-1.5 leading-tight truncate">
-                    {meal?.name.split(' ').slice(0, 2).join(' ') ?? '—'}
-                  </p>
-                </motion.button>
+                </div>
               );
             })}
           </div>
-          <p className="text-[10px] text-[#9CA3AF] italic mt-1.5">Tap to swap · Curate by 8 PM tonight</p>
+          <p className="text-[10px] text-[#9CA3AF] italic mt-1.5">Changes lock at 8 PM the night before</p>
         </div>
 
         {/* Quick actions */}
