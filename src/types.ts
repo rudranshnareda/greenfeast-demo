@@ -65,4 +65,5 @@ export interface User {
   mealPricePerMeal?: number;
   healthProfile?: { age: string; weight: string; height: string; goal: string };
   dietaryPreference?: string;
+  deliveryMode?: 'opt-in' | 'opt-out';
 }

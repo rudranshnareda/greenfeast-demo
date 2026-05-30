@@ -25,8 +25,10 @@ export default function MySubscription() {
   const user = getUserFromStorage()!;
   const status = getStatus();
 
+  // Show only the selected delivery days (respecting user's opt-in/opt-out choice)
   const days = user.selectedDays?.length ? user.selectedDays : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
   const today = new Date().toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 3);
+  const mode = user.deliveryMode ?? 'opt-out';
 
   const getMeal = (id: string) => MEALS.find(m => m.id === id);
   const [weeklyPlan, setWeeklyPlan] = useState(user.weeklyMealPlan ?? {});
@@ -56,9 +58,14 @@ export default function MySubscription() {
             <h1 className="text-2xl font-bold text-[#1A1A1A] leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {getGreeting(user.name)}
             </h1>
-            <div className="flex items-center gap-1 mt-1">
-              <MapPin size={12} className="text-[#9CA3AF]" />
-              <span className="text-xs text-[#9CA3AF] uppercase tracking-wide">{user.address?.city ?? 'Jaipur'}</span>
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-1">
+                <MapPin size={12} className="text-[#9CA3AF]" />
+                <span className="text-xs text-[#9CA3AF] uppercase tracking-wide">{user.address?.city ?? 'Jaipur'}</span>
+              </div>
+              <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-[#E8F5E9] text-[#1B5E20]">
+                {mode === 'opt-in' ? 'Pick days' : 'Skip days'}
+              </span>
             </div>
           </div>
           <img src="/logo.png" alt="GreenFeast" className="w-9 h-9 object-contain opacity-80" />
@@ -88,7 +95,9 @@ export default function MySubscription() {
 
         {/* The week ahead */}
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9CA3AF] mb-2">The week ahead</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#9CA3AF] mb-2">
+            {mode === 'opt-in' ? 'Your delivery days' : 'The week ahead'}
+          </p>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
             {days.map((day, i) => {
               const mealId = weeklyPlan[day];
