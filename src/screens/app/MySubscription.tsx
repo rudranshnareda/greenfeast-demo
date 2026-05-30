@@ -225,7 +225,7 @@ export default function MySubscription() {
               className="relative bg-[#1A2E1A] rounded-t-3xl max-h-[75vh] flex flex-col"
               initial={{ y: 60 }} animate={{ y: 0 }} exit={{ y: 60 }}
               transition={{ duration: 0.25 }}
-              onClick={e => e.stopPropagation()}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between p-5 border-b border-white/10">
                 <h2 className="font-bold text-lg text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>{swapDay}</h2>
