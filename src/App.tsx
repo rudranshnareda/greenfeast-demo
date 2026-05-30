@@ -52,6 +52,16 @@ function App() {
             <Route path="/plan-details" element={<Subscription />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/account" element={<Account />} />
+            {/* Subscription flow — also available to onboarded explore users */}
+            <Route path="/personal-info" element={<PersonalInfo />} />
+            <Route path="/dietary" element={<DietaryPrefs />} />
+            <Route path="/ai-loading" element={<AILoading />} />
+            <Route path="/meal-selection" element={<MealSelection />} />
+            <Route path="/plan" element={<PlanBuilder />} />
+            <Route path="/select-days" element={<SelectDays />} />
+            <Route path="/address" element={<DeliveryAddress />} />
+            <Route path="/review" element={<PaymentSummary />} />
+            <Route path="/payment" element={<OrderPayment />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}
